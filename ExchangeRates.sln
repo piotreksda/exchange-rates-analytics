@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{5879FCA3-EFF9-449F-BA20-846260EAA5D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{51D8BA4D-041C-4A38-83F9-55F336040A9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{85F5211B-9DC1-4FAA-9476-08F3B96A0508}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeRates.AppHost", "aspire\ExchangeRates.AppHost\ExchangeRates.AppHost.csproj", "{5B14AE26-AA10-48FE-9E0B-9114A70482DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeRates.Tests.Unit", "tests\ExchangeRates.Tests.Unit\ExchangeRates.Tests.Unit.csproj", "{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeRates.ServiceDefaults", "aspire\ExchangeRates.ServiceDefaults\ExchangeRates.ServiceDefaults.csproj", "{A89D9126-7B4D-4D68-B515-3C321BF3C343}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeRates", "src\ExchangeRates\ExchangeRates.csproj", "{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B14AE26-AA10-48FE-9E0B-9114A70482DD} = {5879FCA3-EFF9-449F-BA20-846260EAA5D6}
+		{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B} = {51D8BA4D-041C-4A38-83F9-55F336040A9B}
+		{A89D9126-7B4D-4D68-B515-3C321BF3C343} = {5879FCA3-EFF9-449F-BA20-846260EAA5D6}
+		{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B} = {85F5211B-9DC1-4FAA-9476-08F3B96A0508}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B14AE26-AA10-48FE-9E0B-9114A70482DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B14AE26-AA10-48FE-9E0B-9114A70482DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B14AE26-AA10-48FE-9E0B-9114A70482DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B14AE26-AA10-48FE-9E0B-9114A70482DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC64CBC-6C54-4FB9-8A09-AF491D5BF88B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A89D9126-7B4D-4D68-B515-3C321BF3C343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A89D9126-7B4D-4D68-B515-3C321BF3C343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A89D9126-7B4D-4D68-B515-3C321BF3C343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A89D9126-7B4D-4D68-B515-3C321BF3C343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCE502D2-F1FF-48C3-9AB4-5A42D4E6C52B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
