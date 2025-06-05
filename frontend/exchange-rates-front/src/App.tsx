@@ -1,5 +1,5 @@
 import './App.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
@@ -20,6 +20,10 @@ import { Calendar } from '@/components/ui/calendar'
 function App() {
   // Currency options
   const currencies = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "PLN"]
+  
+  // App initialization state
+  const [appInitializing, setAppInitializing] = useState<boolean>(true)
+  const [initError, setInitError] = useState<string | null>(null)
   
   // Simple Conversion States
   const [amount, setAmount] = useState<number>(100)
@@ -43,6 +47,48 @@ function App() {
     from: new Date(2010, 0, 1), // January 1, 2010
     to: new Date(), // Current date
   })
+  
+  // App initialization useEffect
+  useEffect(() => {
+    const initializeApp = async () => {
+      setAppInitializing(true);
+      try {
+        // Try to get default conversion as a test to check if API is ready
+        const result = await api.convert('USD', 'EUR', 1);
+        setConvertedAmount(result.convertedAmount);
+        setConversionResult(`Default USD to EUR: ${result.convertedAmount}`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        
+        // Check if it's a 404 error, which may indicate need for data migration
+        if (errorMessage.includes('404')) {
+          try {
+            // Attempt to migrate data
+            console.log('API returned 404, attempting data migration...');
+            await api.migrate();
+            
+            // Retry the initial conversion after migration
+            const result = await api.convert('USD', 'EUR', 1);
+            setConvertedAmount(result.convertedAmount);
+            setConversionResult(`After migration - USD to EUR: ${result.convertedAmount}`);
+          } catch (migrationError) {
+            // Handle migration failure
+            const migrationErrorMsg = migrationError instanceof Error ? migrationError.message : String(migrationError);
+            setInitError(`Migration failed: ${migrationErrorMsg}`);
+            console.error('Migration failed:', migrationErrorMsg);
+          }
+        } else {
+          // Handle other initialization errors
+          setInitError(`Initialization failed: ${errorMessage}`);
+          console.error('App initialization error:', errorMessage);
+        }
+      } finally {
+        setAppInitializing(false);
+      }
+    };
+
+    initializeApp();
+  }, []); // Empty dependency array means this runs once on mount
   
   // Handler for single currency conversion
   const handleConvert = async () => {
@@ -99,6 +145,32 @@ function App() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
       <h1 className="text-2xl font-bold mb-2">Exchange Rates Analytics</h1>
+      
+      {/* App Initialization Status */}
+      {appInitializing && (
+        <div className="w-full max-w-4xl bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+          <p className="text-center text-blue-700">
+            Initializing application, please wait...
+          </p>
+        </div>
+      )}
+      
+      {/* Initialization Error */}
+      {initError && !appInitializing && (
+        <div className="w-full max-w-4xl bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+          <p className="text-center text-red-700">
+            {initError}
+          </p>
+          <div className="flex justify-center mt-2">
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
       
       {/* Simple Conversion Card */}
       <Card className="w-full max-w-4xl">
@@ -166,7 +238,7 @@ function App() {
               <Button 
                 onClick={handleConvert} 
                 className="ml-auto"
-                disabled={conversionLoading}
+                disabled={appInitializing || conversionLoading}
               >
                 Convert
               </Button>
@@ -351,7 +423,11 @@ function App() {
       </Card>
       
       {/* Loading and Result States */}
-      {(conversionLoading || chartLoading) && <p className="text-center">Loading...</p>}
+      {(appInitializing || conversionLoading || chartLoading) && (
+        <p className="text-center">
+          {appInitializing ? 'Initializing...' : 'Loading...'}
+        </p>
+      )}
       
       {(conversionResult || chartResult) && !(conversionLoading || chartLoading) && (
         <div className="mt-2 p-4 border rounded bg-gray-50 max-w-lg overflow-auto hidden">

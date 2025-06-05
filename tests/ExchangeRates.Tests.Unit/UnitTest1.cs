@@ -26,7 +26,8 @@ public sealed class UnitTest1(ApiFixture apiFixture) : IClassFixture<ApiFixture>
         ]);
         
         var client = apiFixture.CreateClient();
-        var response = await client.GetAsync("api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Quarter&startDate=2010-01-01&endDate=2025-06-05");
+        var response = await client.GetAsync(
+            "api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Quarter&startDate=2010-01-01&endDate=2025-06-05");
         var result = await response.Content.ReadFromJsonAsync<ChartDto[]>();
         var labels = result?.Select(x => x.Label).ToArray();
         Assert.NotNull(result);
@@ -55,7 +56,8 @@ public sealed class UnitTest1(ApiFixture apiFixture) : IClassFixture<ApiFixture>
             }
         ]);
         var client = apiFixture.CreateClient();
-        var response = await client.GetAsync("api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Month&startDate=2010-01-01&endDate=2025-06-05");
+        var response = await client.GetAsync(
+            "api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Month&startDate=2010-01-01&endDate=2025-06-05");
         var result = await response.Content.ReadFromJsonAsync<ChartDto[]>();
         var labels = result?.Select(x => x.Label).ToArray();
         Assert.NotNull(result);
@@ -84,7 +86,8 @@ public sealed class UnitTest1(ApiFixture apiFixture) : IClassFixture<ApiFixture>
             }
         ]);
         var client = apiFixture.CreateClient();
-        var response = await client.GetAsync("api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Year&startDate=2010-01-01&endDate=2025-06-05");
+        var response = await client.GetAsync(
+            "api/chart?from=PLN&to=USD&chartMode=Sell&chartTimeWindow=Year&startDate=2010-01-01&endDate=2025-06-05");
         var result = await response.Content.ReadFromJsonAsync<ChartDto[]>();
         var labels = result?.Select(x => x.Label).ToArray();
         Assert.NotNull(result);
