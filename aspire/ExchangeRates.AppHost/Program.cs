@@ -7,9 +7,12 @@ var project = builder.AddProject<Projects.ExchangeRates>("exchanes-rates").WithR
 builder.AddNpmApp("react", "../../frontend/exchange-rates-front")
     .WithReference(project)
     .WaitFor(project)
-    .WithEnvironment("BROWSER", "none") // Disable opening browser on npm start
+    .WithEnvironment("BROWSER", "none")
+    .WithEnvironment("VITE_API_BASE_URL", project.GetEndpoint("http"))
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile();
+
+// builder.AddDockerComposePublisher();
 
 builder.Build().Run();

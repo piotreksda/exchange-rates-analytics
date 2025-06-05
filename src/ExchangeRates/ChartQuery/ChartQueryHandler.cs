@@ -89,7 +89,6 @@ public class ChartQueryHandler(AppDbContext dbContext) : IRequestHandler<ChartQu
 
         var result = await dbContext.Database.SqlQueryRaw<ConvertedExchangeRateDto>(sql)
             .ToListAsync(cancellationToken: cancellationToken);
-        var dbg = await dbContext.ExchangeRates.ToListAsync();
 
         return
             result.GroupBy(x => x.TimeWindow).Select(group => new ChartDto()

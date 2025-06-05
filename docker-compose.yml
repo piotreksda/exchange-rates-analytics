@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./src/ExchangeRates
+      dockerfile: Dockerfile
+    ports:
+      - "12344:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__pg=Host=postgres;Database=exchangerates;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+    networks:
+      - exchange-rates-network
+
+  postgres:
+    image: postgres:16
+    container_name: exchange-rates-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=exchangerates
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - exchange-rates-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend/exchange-rates-front
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:12344
+    ports:
+      - "12355:80"
+    environment:
+      - PORT=80
+    depends_on:
+      - api
+    networks:
+      - exchange-rates-network
+
+networks:
+  exchange-rates-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

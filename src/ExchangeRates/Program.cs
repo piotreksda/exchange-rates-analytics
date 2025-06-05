@@ -105,7 +105,11 @@ app.MapGet("/api/convert", async ([FromQuery] string from, [FromQuery] string to
 });
 
 app.MapGet("/api/chart",
-    async ([FromQuery] string from, [FromQuery] string[] to, [FromQuery] ChartMode chartMode, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
+    async ([FromQuery] string from,
+        [FromQuery] string[] to,
+        [FromQuery] ChartMode chartMode,
+        [FromQuery] DateOnly? startDate,
+        [FromQuery] DateOnly? endDate,
         [FromQuery] ChartTimeWindow chartTimeWindow,
         [FromServices] IMediator mediator) =>
     {
