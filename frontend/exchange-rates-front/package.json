@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "PORT=${PORT:-5189} vite"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

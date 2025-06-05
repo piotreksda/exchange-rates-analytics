@@ -134,3 +134,5 @@ static async Task MigrateAsync(IServiceProvider serviceProvider)
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
 }
+
+public partial class Program;

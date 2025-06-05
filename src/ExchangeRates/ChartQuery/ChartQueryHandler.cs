@@ -10,9 +10,7 @@ public class ChartQueryHandler(AppDbContext dbContext) : IRequestHandler<ChartQu
 {
     public async Task<ChartDto[]> Handle(ChartQuery request, CancellationToken cancellationToken)
     {
-        var fromCurrency = "PLN";
-        var toCurrencies = new[] { "EUR", "GBP", "CHF" };
-        var tocurrenciesSqlParam = string.Join(", ", toCurrencies.Select(x => $"'{x}'").ToArray());
+        var tocurrenciesSqlParam = string.Join(", ", request.To.Select(x => $"'{x}'").ToArray());
 
         var sql = $"""
                    WITH vars AS (SELECT '{request.From}'::text AS from_currency, 
@@ -91,6 +89,7 @@ public class ChartQueryHandler(AppDbContext dbContext) : IRequestHandler<ChartQu
 
         var result = await dbContext.Database.SqlQueryRaw<ConvertedExchangeRateDto>(sql)
             .ToListAsync(cancellationToken: cancellationToken);
+        var dbg = await dbContext.ExchangeRates.ToListAsync();
 
         return
             result.GroupBy(x => x.TimeWindow).Select(group => new ChartDto()
