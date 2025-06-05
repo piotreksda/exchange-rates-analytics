@@ -18,64 +18,60 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 
 function App() {
-  // State for form values
+  // Currency options
+  const currencies = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "PLN"]
+  
+  // Simple Conversion States
   const [amount, setAmount] = useState<number>(100)
   const [fromCurrency, setFromCurrency] = useState<string>('USD')
   const [toCurrency, setToCurrency] = useState<string>('EUR')
+  const [convertedAmount, setConvertedAmount] = useState<number | null>(null)
+  const [conversionLoading, setConversionLoading] = useState<boolean>(false)
+  const [conversionResult, setConversionResult] = useState<string | null>(null)
+  
+  // Chart States
+  const [chartFromCurrency, setChartFromCurrency] = useState<string>('USD')
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>(['EUR'])
   const [chartMode, setChartMode] = useState<ChartMode>(ChartMode.BUY)
   const [timeWindow, setTimeWindow] = useState<ChartTimeWindow>(ChartTimeWindow.MONTH)
+  const [chartLoading, setChartLoading] = useState<boolean>(false)
+  const [chartResult, setChartResult] = useState<string | null>(null)
+  const [chartData, setChartData] = useState<Array<{name: string, value: number}>>([])
   
   // State for date range
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2010, 0, 1), // January 1, 2010
     to: new Date(), // Current date
   })
-
-  // State for API results
-  const [loading, setLoading] = useState<boolean>(false)
-  const [result, setResult] = useState<string | null>(null)
-  const [chartData, setChartData] = useState<Array<{name: string, value: number}>>([])
-
-  // Currency options
-  const currencies = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "PLN"]
   
   // Handler for single currency conversion
   const handleConvert = async () => {
     if (!amount || !fromCurrency || !toCurrency) return
     
-    setLoading(true)
+    setConversionLoading(true)
     try {
       const response = await api.convert(fromCurrency, toCurrency, amount)
-      setResult(`Converted ${response.fromCurrency} to ${response.toCurrency}: ${response.convertedAmount}`)
-      
-      // Mock chart data for visualization
-      const mockData = [
-        { name: 'Jan', value: 100 },
-        { name: 'Feb', value: 120 },
-        { name: 'Mar', value: 110 },
-        { name: 'Apr', value: 130 },
-        { name: 'May', value: 90 },
-      ]
-      setChartData(mockData)
+      setConvertedAmount(response.convertedAmount)
+      setConversionResult(`Converted ${response.fromCurrency} to ${response.toCurrency}: ${response.convertedAmount}`)
     } catch (error) {
-      setResult(`Error: ${error instanceof Error ? error.message : String(error)}`)
+      setConversionResult(`Error: ${error instanceof Error ? error.message : String(error)}`)
+      setConvertedAmount(null)
     } finally {
-      setLoading(false)
+      setConversionLoading(false)
     }
   }
 
   // Handler for chart data
   const handleGetChart = async () => {
-    if (!fromCurrency || selectedCurrencies.length === 0) return
+    if (!chartFromCurrency || selectedCurrencies.length === 0) return
     
-    setLoading(true)
+    setChartLoading(true)
     try {
       const from = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined
       const to = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined
       
       const response = await api.getChartData(
-        fromCurrency,
+        chartFromCurrency,
         selectedCurrencies,
         chartMode,
         timeWindow,
@@ -83,7 +79,7 @@ function App() {
         to
       )
       
-      setResult(`Chart data: ${JSON.stringify(response, null, 2)}`)
+      setChartResult(`Chart data: ${JSON.stringify(response, null, 2)}`)
       
       // Transform the response data for the chart
       // Assuming response is an array of ChartResponse
@@ -94,9 +90,9 @@ function App() {
       
       setChartData(chartDataFormatted)
     } catch (error) {
-      setResult(`Error: ${error instanceof Error ? error.message : String(error)}`)
+      setChartResult(`Error: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
-      setLoading(false)
+      setChartLoading(false)
     }
   }
 
@@ -170,7 +166,7 @@ function App() {
               <Button 
                 onClick={handleConvert} 
                 className="ml-auto"
-                disabled={loading}
+                disabled={conversionLoading}
               >
                 Convert
               </Button>
@@ -179,7 +175,15 @@ function App() {
             {/* Conversion Result Display */}
             <div className="mt-2">
               <div className="h-[120px] border rounded-md p-4 flex items-center justify-center">
-                <p className="text-center text-muted-foreground">1 {fromCurrency} currently is {amount} {toCurrency}</p>
+                {convertedAmount !== null ? (
+                  <p className="text-center text-muted-foreground">
+                    {amount} {fromCurrency} = {convertedAmount} {toCurrency}
+                  </p>
+                ) : (
+                  <p className="text-center text-muted-foreground">
+                    Click Convert to see the exchange rate
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -195,8 +199,8 @@ function App() {
               <div>
                 <Label className="block mb-2">From Currency</Label>
                 <Select 
-                  value={fromCurrency} 
-                  onValueChange={setFromCurrency}
+                  value={chartFromCurrency} 
+                  onValueChange={setChartFromCurrency}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="From" />
@@ -222,7 +226,7 @@ function App() {
                     <SelectValue placeholder="To" />
                   </SelectTrigger>
                   <SelectContent>
-                    {currencies.filter(c => c !== fromCurrency).map(currency => (
+                    {currencies.filter(c => c !== chartFromCurrency).map(currency => (
                       <SelectItem key={currency} value={currency}>
                         {currency}
                       </SelectItem>
@@ -305,7 +309,7 @@ function App() {
             <Button 
               onClick={handleGetChart} 
               className="ml-auto"
-              disabled={loading}
+              disabled={chartLoading}
             >
               Get Chart Data
             </Button>              {/* Chart Display */}
@@ -328,10 +332,10 @@ function App() {
                       <Tooltip />
                       <Legend verticalAlign="top" height={36} />
                       <Line 
-                        name={`${fromCurrency} to ${selectedCurrencies[0]}`}
+                        name={`${chartFromCurrency} to ${selectedCurrencies[0]}`}
                         type="monotone" 
                         dataKey="value" 
-                        stroke="#8884d8" 
+                        stroke="#000000" 
                         strokeWidth={2}
                         activeDot={{ r: 8 }}
                       />
@@ -347,11 +351,11 @@ function App() {
       </Card>
       
       {/* Loading and Result States */}
-      {loading && <p className="text-center">Loading...</p>}
+      {(conversionLoading || chartLoading) && <p className="text-center">Loading...</p>}
       
-      {result && !loading && (
+      {(conversionResult || chartResult) && !(conversionLoading || chartLoading) && (
         <div className="mt-2 p-4 border rounded bg-gray-50 max-w-lg overflow-auto hidden">
-          <pre className="whitespace-pre-wrap">{result}</pre>
+          <pre className="whitespace-pre-wrap">{conversionResult || chartResult}</pre>
         </div>
       )}
     </div>

@@ -95,10 +95,22 @@ public class ChartQueryHandler(AppDbContext dbContext) : IRequestHandler<ChartQu
         return
             result.GroupBy(x => x.TimeWindow).Select(group => new ChartDto()
             {
-                Label = group.Key.ToString(CultureInfo.InvariantCulture),
+                Label = ToLabel(group.Key, request.TimeWindow),
                 Data = group.ToDictionary(
                     x => x.CurrencyCode,
                     x => request.ChartMode == ChartMode.Buy ? x.AvgRate : x.RevertedAvgRate)
             }).ToArray();
+    }
+    
+    private static string ToLabel(DateTime date, ChartTimeWindow timeWindow)
+    {
+        return timeWindow switch
+        {
+            ChartTimeWindow.Day => date.ToString("yyyy-MM-dd"),
+            ChartTimeWindow.Quarter => $"Q{(date.Month - 1) / 3 + 1} {date.Year}",
+            ChartTimeWindow.Month => date.ToString("yyyy-MM"),
+            ChartTimeWindow.Year => date.ToString("yyyy"),
+            _ => throw new ArgumentOutOfRangeException(nameof(timeWindow), timeWindow, null)
+        };
     }
 }
