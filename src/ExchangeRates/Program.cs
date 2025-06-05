@@ -10,6 +10,15 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(x =>
+{
+    x.AddDefaultPolicy(cfg => 
+        cfg.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+});
+
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddNbpClient(builder.Configuration);
 builder.Services.AddOpenApi();
@@ -21,6 +30,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseCors();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -29,7 +40,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => "");
 
-app.MapPost("/migrate", async ([FromServices] AppDbContext dbContext, [FromServices] NbpHttpClient nbpClient) =>
+app.MapPost("/api/migrate", async ([FromServices] AppDbContext dbContext, [FromServices] NbpHttpClient nbpClient) =>
 {
     var startDate = new DateTime(2010, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToUniversalTime();
     var endDate = DateTime.UtcNow.Date;
@@ -59,7 +70,7 @@ app.MapPost("/migrate", async ([FromServices] AppDbContext dbContext, [FromServi
     }
 });
 
-app.MapGet("/convert", async ([FromQuery] string from, [FromQuery] string to, [FromQuery] double amount,
+app.MapGet("/api/convert", async ([FromQuery] string from, [FromQuery] string to, [FromQuery] double amount,
     [FromServices] AppDbContext dbContext) =>
 {
     var fromRate = from.ToLower() == "pln"
@@ -93,9 +104,9 @@ app.MapGet("/convert", async ([FromQuery] string from, [FromQuery] string to, [F
     });
 });
 
-app.MapGet("/chart",
-    async ([FromQuery] string from, string[] to, ChartMode chartMode, DateOnly? startDate, DateOnly? endDate,
-        ChartTimeWindow chartTimeWindow,
+app.MapGet("/api/chart",
+    async ([FromQuery] string from, [FromQuery] string[] to, [FromQuery] ChartMode chartMode, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
+        [FromQuery] ChartTimeWindow chartTimeWindow,
         [FromServices] IMediator mediator) =>
     {
         var query = new ChartQuery(
